@@ -1,0 +1,12 @@
+{
+  "name": "keller-counter",
+  "version": "0.1.0",
+  "dependencies": {
+    "ejs": "^2.3.4",
+    "express": "^4.13.3",
+    "request": "^2.65.0"
+  },
+  "engines": {
+    "node": "0.12.2"
+  }
+}
