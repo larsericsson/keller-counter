@@ -11,20 +11,25 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
   var count = 0;
+  var stores = [];
 
   var url = 'http://www.systembolaget.se/api/site/findstoresincountywhereproducthasstock/Stockholms%20l%C3%A4n/896008/1';
   request(url, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       var json = JSON.parse(body);
-      console.log(json);
       json['SiteStockBalance'].forEach(function(site) {
         console.log(site);
         count += site['Stock']['Stock'];
+        stores.push({
+          'store': site['Site']['Name'],
+          'stock': site['Stock']['Stock']
+        });
       });
     }
 
     res.render('index', {
-      count: count
+      count: count,
+      stores: stores
     });
   });
 });
