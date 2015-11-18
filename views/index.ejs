@@ -9,11 +9,13 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
-    <h1><%= count %></h1>
-    <ul>
-      <% for(var i = 0; i < stores.length; i++) { %>
-        <li><%= stores[i].store %>: <%= stores[i].stock %></li>
-      <% } %>
-    </ul>
+    <div class="counter">
+      <h1 class="count"><%= count %></h1>
+      <div>
+        <% for(var i = 0; i < stores.length; i++) { %>
+          <%= stores[i].store %> (<%= stores[i].stock %>)<% if (i != stores.length-1) { %>,<%}%>
+        <% } %>
+      </div>
+    </div>
   </body>
 </html>
