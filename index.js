@@ -11,10 +11,11 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
 
-  Store.get(function (stores, count) {
+  Store.get(function (store) {
     res.render('index', {
-      count: count,
-      stores: stores
+      count: store.count,
+      stores: store.stores,
+      fetched: store.fetched
     });
   }, function (error) {
     console.log('Got error: ' + error);

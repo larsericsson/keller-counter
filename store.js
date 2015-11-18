@@ -1,10 +1,10 @@
 var request = require('request');
 
 module.exports = function () {
-	var get = function (success, error) {
-		var count = 0, stores = [];
+	var store = undefined, timeToLive = 5 * 60 * 1000;
 
-		var fetchPagesFrom = function (page) {
+	var get = function (success, error) {
+		var count = 0, stores = [], _fetchPagesFrom = function (page) {
 			var url = 'http://www.systembolaget.se/api/site/findstoresincountywhereproducthasstock/Stockholms%20l%C3%A4n/896008/';
 			
 			request(url + page, function(error, response, body) {
@@ -21,9 +21,15 @@ module.exports = function () {
 					});
 
 					if (stores.length < total) {
-						fetchPagesFrom(page + 1)
+						_fetchPagesFrom(page + 1)
 					} else {
-						success(stores, count);
+						store = {
+							fetched: new Date().getTime(),
+							count: count,
+							stores: stores
+						};
+
+						success(store);
 					}
 				} else {
 					error('Could not fetch stores.');
@@ -31,7 +37,12 @@ module.exports = function () {
 	  		});
 		};
 
-		fetchPagesFrom(1);
+		var now = new Date().getTime();
+		if (store && store.fetched > now - timeToLive) {
+			success(store);
+		} else {
+			_fetchPagesFrom(1);
+		}
 	};
 
 	return {
