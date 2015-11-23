@@ -20,6 +20,7 @@ module.exports = function () {
         else if (typeof(success) == 'function') success();
       });
     },
+
     getLatestFetch: function (success, error) {
       Store.findOne({}).sort({fetched: -1}).exec(function (err, stores) {
         if (!err && typeof(success) == 'function') success(stores);

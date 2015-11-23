@@ -32,7 +32,7 @@ app.get('/fetch', function(req, res) {
   };
 
   DB.getLatestFetch(function (stores) {
-    if (stores.fetched + 30 * 60 * 1000 < new Date().getTime()) {
+    if (!stores || stores.fetched + 30 * 60 * 1000 < new Date().getTime()) {
       Store.get(function (store) {
         DB.save(store, function () {
           result('Saved ' + store.count + ' at ' + store.fetched);
