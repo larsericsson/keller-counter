@@ -1,7 +1,9 @@
 var express = require('express');
+var DB = require('./db.js');
 var app = express();
 var Store = require('./store.js');
-var DB = require('./db.js');
+
+setupDatabase();
 
 app.set('port', (process.env.PORT || 5000));
 

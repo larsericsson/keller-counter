@@ -1,5 +1,32 @@
 var request = require('request');
+var mongoose = require('mongoose');
 
+var storeSchema = mongoose.Schema({
+  fetched: Number,
+  count: Number,
+  stores: [{
+    store: String,
+    stock: Number
+  }]
+});
+
+storeSchema.method.save = function(stores, success, error) {
+  new Store(stores).save(function (err) {
+    if (err && typeof(error) == 'function') error(err);
+    else if (typeof(success) == 'function') success();
+  });
+};
+
+storeSchema.static.getLatestFetch = function(success, error) {
+  Store.findOne({}).sort({fetched: -1}).exec(function (err, stores) {
+    if (!err && typeof(success) == 'function') success(stores);
+    else if (typeof(error) == 'function') error(err);
+  });
+};
+
+var Store = mongoose.model('Store', storeSchema);
+
+// Refactor this into service or static method
 module.exports = function () {
   var store = undefined, timeToLive = 1 * 60 * 1000;
 
