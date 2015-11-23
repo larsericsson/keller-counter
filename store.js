@@ -6,12 +6,12 @@ module.exports = function () {
   var get = function (success, error) {
     var count = 0, stores = [], _fetchPagesFrom = function (page) {
       var url = 'http://www.systembolaget.se/api/site/findstoresincountywhereproducthasstock/Stockholms%20l%C3%A4n/896008/';
-      
+
       request(url + page, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           var json = JSON.parse(body);
           var total = json['DocCount'];
-          
+
           json['SiteStockBalance'].forEach(function(site) {
             count += site['Stock']['Stock'];
             stores.push({
