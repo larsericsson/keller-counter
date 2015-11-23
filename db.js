@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 module.exports = function () {
-  mongoose.connect(process.env.MONGOLAB_URI);
+  mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/keller-counter');
 
   var storeSchema = mongoose.Schema({
       fetched: Number,
