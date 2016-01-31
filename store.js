@@ -1,7 +1,8 @@
 var request = require('request');
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var storeSchema = mongoose.Schema({
+var StoreSchema = new Schema({
   fetched: Number,
   count: Number,
   stores: [{
@@ -10,69 +11,55 @@ var storeSchema = mongoose.Schema({
   }]
 });
 
-storeSchema.method.save = function(stores, success, error) {
-  new Store(stores).save(function (err) {
-    if (err && typeof(error) == 'function') error(err);
-    else if (typeof(success) == 'function') success();
-  });
-};
-
-storeSchema.static.getLatestFetch = function(success, error) {
+StoreSchema.statics.getLatestFetch = function(success, error) {
+  console.log('Getting latest fetch');
+  var Store = this;
   Store.findOne({}).sort({fetched: -1}).exec(function (err, stores) {
     if (!err && typeof(success) == 'function') success(stores);
     else if (typeof(error) == 'function') error(err);
   });
 };
 
-var Store = mongoose.model('Store', storeSchema);
+StoreSchema.statics.fetch = function(success, error) {
+  console.log('Fetching store from API');
+  var Store = this;
+  var count = 0;
+  var stores = [];
+  var _fetchPagesFrom = function(page) {
+    console.log('Fetching page ', page);
+    var url = 'http://www.systembolaget.se/api/site/findstoresincountywhereproducthasstock/Stockholms%20l%C3%A4n/896008/';
 
-// Refactor this into service or static method
-module.exports = function () {
-  var store = undefined, timeToLive = 1 * 60 * 1000;
+    request(url + page, function(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var json = JSON.parse(body);
+        var total = json['DocCount'];
 
-  var get = function (success, error) {
-    var count = 0, stores = [], _fetchPagesFrom = function (page) {
-      var url = 'http://www.systembolaget.se/api/site/findstoresincountywhereproducthasstock/Stockholms%20l%C3%A4n/896008/';
+        json['SiteStockBalance'].forEach(function(site) {
+          count += site['Stock']['Stock'];
+          stores.push({
+            'store': site['Site']['Name'],
+            'stock': site['Stock']['Stock']
+          });
+        });
 
-      request(url + page, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          var json = JSON.parse(body);
-          var total = json['DocCount'];
-
-          json['SiteStockBalance'].forEach(function(site) {
-            count += site['Stock']['Stock'];
-            stores.push({
-              'store': site['Site']['Name'],
-              'stock': site['Stock']['Stock']
-            });
+        if (stores.length < total) {
+          _fetchPagesFrom(page + 1)
+        } else {
+          var newStore = new Store({
+            fetched: new Date().getTime(),
+            count: count,
+            stores: stores
           });
 
-          if (stores.length < total) {
-            _fetchPagesFrom(page + 1)
-          } else {
-            store = {
-              fetched: new Date().getTime(),
-              count: count,
-              stores: stores
-            };
-
-            typeof(success) == 'function' && success(store);
-          }
-        } else {
-          typeof(error) == 'function' && error('Could not fetch stores.');
+          typeof(success) == 'function' && success(newStore);
         }
-        });
-    };
-
-    var now = new Date().getTime();
-    if (store && store.fetched > now - timeToLive) {
-      typeof(success) == 'function' && success(store);
-    } else {
-      _fetchPagesFrom(1);
-    }
+      } else {
+        typeof(error) == 'function' && error('Could not fetch stores.');
+      }
+      });
   };
 
-  return {
-    get: get
-  };
-}();
+  _fetchPagesFrom(1);
+};
+
+module.exports = mongoose.model('Store', StoreSchema);

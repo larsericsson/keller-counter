@@ -27,24 +27,31 @@ app.get('/', function(req, res) {
 });
 
 app.get('/fetch', function(req, res) {
+  console.log('Fetching store');
   var result = function (message) {
     res.render('fetch', {
       message: message
     });
   };
 
-  DB.getLatestFetch(function (stores) {
+  Store.getLatestFetch(function (stores) {
     if (!stores || stores.fetched + 30 * 60 * 1000 < new Date().getTime()) {
-      Store.get(function (store) {
-        DB.save(store, function () {
+      console.log('Old fetch too old, fetching from API');
+      Store.fetch(function(store) {
+        console.log('Got store ', store);
+        store.save(function(err, store) {
+          if (err) return result(err);
           result('Saved ' + store.count + ' at ' + store.fetched);
         });
-      }, function (error) {
-        console.log('Got error: ' + error);
+      }, function(err) {
+        console.log(err);
+        result(err);
       });
     } else {
       result('Already fetched ' + stores.fetched);
     }
+  }, function(err) {
+    console.log(err);
   });
 });
 
