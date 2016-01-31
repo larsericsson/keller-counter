@@ -14,11 +14,17 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
 
-  Store.getLatestFetch(function (store) {
+  Store.getNLatest(2, function (stores) {
+    var trend = stores[0].count - stores[1].count;
+    if (trend >= 0) {
+      trend = '+' + trend;
+    }
+
     res.render('index', {
-      count: store.count,
-      stores: store.stores,
-      fetched: store.fetched
+      count: stores[0].count,
+      trend: trend,
+      stores: stores[0].stores,
+      fetched: stores[0].fetched
     });
   }, function (error) {
     console.log('Got error: ' + error);

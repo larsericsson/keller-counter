@@ -11,6 +11,15 @@ var StoreSchema = new Schema({
   }]
 });
 
+StoreSchema.statics.getNLatest = function(n, success, error) {
+  console.log('Getting ' + n + ' latest');
+  var Store = this;
+  Store.find({}).sort({fetched: -1}).limit(n).exec(function (err, stores) {
+    if (!err && typeof(success) == 'function') success(stores);
+    else if (typeof(error) == 'function') error(err);
+  });
+};
+
 StoreSchema.statics.getLatestFetch = function(success, error) {
   console.log('Getting latest fetch');
   var Store = this;

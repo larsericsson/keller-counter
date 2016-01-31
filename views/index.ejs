@@ -3,7 +3,7 @@
   <% include partials/head %>
   <body>
     <div class="counter">
-      <h1 class="count appear"><%= count %></h1>
+      <h1 class="count appear"><%= count %> (<%= trend %>)</h1>
       <div>
         <% for(var i = 0; i < stores.length; i++) { %>
           <%= stores[i].store %> (<%= stores[i].stock %>)<% if (i != stores.length-1) { %>,<%}%>
