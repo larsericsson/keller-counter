@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
 
-  Store.get(function (store) {
+  Store.getLatestFetch(function (store) {
     res.render('index', {
       count: store.count,
       stores: store.stores,
