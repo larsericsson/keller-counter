@@ -15,16 +15,21 @@ app.set('view engine', 'ejs');
 app.get('/', function(req, res) {
 
   Store.getNLatest(2, function (stores) {
-    var trend = stores[0].count - stores[1].count;
-    if (trend >= 0) {
-      trend = '+' + trend;
+    var trend = '± 0';
+    if (stores.length < 2) {
+      console.warn('Only got %d stores', stores.length);
+    } else {
+      trend = stores[0].count - stores[1].count;
+      if (trend >= 0) {
+        trend = '+' + trend;
+      }
     }
 
     res.render('index', {
-      count: stores[0].count,
+      count: stores[0] ? stores[0].count : 0,
       trend: trend,
-      stores: stores[0].stores,
-      fetched: stores[0].fetched
+      stores: stores[0] ? stores[0].stores : 0,
+      fetched: stores[0] ? stores[0].fetched : 0
     });
   }, function (error) {
     console.log('Got error: ' + error);
