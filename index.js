@@ -41,7 +41,7 @@ app.get('/fetch', function(req, res) {
   };
 
   Store.getLatestFetch(function (stores) {
-    if (!stores || stores.fetched + 30 * 60 * 1000 < new Date().getTime()) {
+    if (!stores || stores.fetched + 5 * 60 * 1000 < new Date().getTime()) {
       console.log('Old fetch too old, fetching from API');
       Store.fetch(function(store) {
         console.log('Got store ', store);
