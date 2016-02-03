@@ -2,13 +2,22 @@
 <html lang="en">
   <% include partials/head %>
   <body>
+    <div id="map"></div>
     <div class="counter">
-      <h1 class="count appear"><%= count %> (<%= trend %>)</h1>
-      <div>
+<!--       <img src="/img/kellerbier.png"> -->
+      <div class="center">
+        <p class="lead">Kellerbiers in Stockholm:</p>
+        <h1 class="count"><%= count %> (<%= trend %>)</h1>
+      </div>
+       <div>
         <% for(var i = 0; i < stores.length; i++) { %>
           <%= stores[i].store %> (<%= stores[i].stock %>)<% if (i != stores.length-1) { %>,<%}%>
         <% } %>
       </div>
     </div>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmzrNnh75LP-akPWqOCIXFPDj61XR5i-M&callback=kellercounter.map.init">
+    </script>
+    <script src="/javascripts/main.js"></script>
   </body>
 </html>
